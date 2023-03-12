@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "531251245403",
+    "project_id": "miniprojectcomplaintbox",
+    "storage_bucket": "miniprojectcomplaintbox.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531251245403:android:2a3c875150f3639c2a6a7e",
+        "android_client_info": {
+          "package_name": "com.example.miniprojectcomplaintbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531251245403-fdbmlt3gv2i32op3e8608c6q81f7uqgg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkkbpwVBYU-cBPDm8SE4dkqlmcuTwUzbU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531251245403-fdbmlt3gv2i32op3e8608c6q81f7uqgg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
