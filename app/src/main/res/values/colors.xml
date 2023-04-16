@@ -7,5 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="purple">#8692f7</color>
+    <color name="dark_turquoise">#FF2596BE</color>
+    <color name="card_background">#CC2596BE</color>
+    <color name="turquoise">#FF40E0D0</color>
+    <color name="medium_orchid">#FF9925BE</color>
+    <color name="tomato_500">#FFBE4D25</color>
+    <color name="tomato_200">#F4612D</color>
+    <color name="lawn_green">#FF49BE25</color>
+    <color name="green_cardBG">#4D49BE25</color>
+    <color name="tomato_cardBG">#4DBE4D25</color>
+    <color name="yellow_200">#FFEB3B</color>
+    <color name="purple">#A020F0</color>
 </resources>

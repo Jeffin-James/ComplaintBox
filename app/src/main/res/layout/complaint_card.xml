@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="@dimen/_10sdp"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/comp_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/_5sdp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/tomato_cardBG"
+        app:cardCornerRadius="@dimen/_8sdp">
+
+        <LinearLayout
+            android:id="@+id/comp_status_indicator"
+            android:layout_width="@dimen/_10sdp"
+            android:background="@color/tomato_500"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:padding="@dimen/_10sdp">
+
+            <TextView
+                android:id="@+id/card_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sample Title"
+                android:textSize="@dimen/_14ssp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!--<LinearLayout
+                android:id="@+id/card_separator"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_2sdp"
+                app:layout_constraintTop_toBottomOf="@id/card_title"
+                app:layout_constraintEnd_toStartOf="@id/card_image"
+                android:background="@color/tomato_500"
+                android:orientation="horizontal" />-->
+
+            <TextView
+                android:id="@+id/card_loc"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="wrap_content"
+                android:text="Sample Location"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:padding="@dimen/_2sdp"
+                android:textSize="@dimen/_12ssp"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_title"
+                android:drawablePadding="@dimen/_2sdp"
+                android:drawableTint="#838383"
+                app:drawableEndCompat="@drawable/ic_baseline_location_on_24" />
+
+            <TextView
+                android:id="@+id/card_dist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sample District"
+                android:textSize="@dimen/_12ssp"
+                android:padding="@dimen/_2sdp"
+
+                android:layout_marginStart="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_loc" />
+
+            <TextView
+                android:id="@+id/card_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sample Time"
+
+                android:textSize="@dimen/_12ssp"
+                android:padding="@dimen/_2sdp"
+                android:layout_marginStart="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/card_dist" />
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/card_image"
+                app:riv_corner_radius="@dimen/_8sdp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="@dimen/_100sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="MissingClass" />
+
+            <TextView
+                android:id="@+id/card_videoStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Video included"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:gravity="center"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_time"
+                android:drawablePadding="@dimen/_2sdp"
+                android:drawableTint="#838383"
+                android:visibility="gone"
+                app:drawableEndCompat="@drawable/ic_baseline_videocam_24" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>
