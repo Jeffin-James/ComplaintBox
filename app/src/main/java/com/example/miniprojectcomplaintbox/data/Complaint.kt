@@ -12,5 +12,6 @@ data class Complaint
      val userId: String ?= null,
      val complaintId: String ?= null,
      val solved: Boolean ?= false,
-     val imageUrlList: List<String> ?= null
+     val imageUrlList: List<String> ?= null,
+     val count: Long ?= null
      ) : java.io.Serializable

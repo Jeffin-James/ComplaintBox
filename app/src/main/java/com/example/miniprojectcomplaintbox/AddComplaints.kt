@@ -19,8 +19,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.miniprojectcomplaintbox.adapter.ImageViewRvAdapter
 import com.example.miniprojectcomplaintbox.data.Complaint
+import com.example.miniprojectcomplaintbox.data.KeyData
 import com.example.miniprojectcomplaintbox.data.LoginData
 import com.example.miniprojectcomplaintbox.databinding.ActivityAddComplaintsBinding
+import com.example.miniprojectcomplaintbox.model.UserData
 import com.example.miniprojectcomplaintbox.notification.NotificationData
 import com.example.miniprojectcomplaintbox.notification.PushNotification
 import com.example.miniprojectcomplaintbox.notification.RetrofitInstance
@@ -37,6 +39,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -51,6 +54,7 @@ class AddComplaints : AppCompatActivity() {
     private lateinit var uriList: MutableList<Uri>
     private val imageUrlList = mutableListOf<String>()
     private var district = ""
+    private var count: Long = 0
 
     private val exoPlayer2 by lazy {
         ExoPlayer.Builder(this)
@@ -110,7 +114,7 @@ class AddComplaints : AppCompatActivity() {
 
     private fun extractData() {
         if (binding.etDistrict.text.toString().isNotEmpty() && binding.etComplaintDescription.text.toString().isNotEmpty()
-            && binding.etLocation.text.toString().isNotEmpty()
+            && binding.etLocation.text.toString().isNotEmpty() && binding.etCount.text.toString().isNotEmpty()
         ) {
             initStorageProcess()
         } else {
@@ -145,6 +149,7 @@ class AddComplaints : AppCompatActivity() {
                             storeInDatabase()
                     }
                 }.addOnFailureListener {
+                    com.example.miniprojectcomplaintbox.utils.dismissDialog()
                     Toast.makeText(
                         this,
                         "Failed to post the data please retry!!",
@@ -157,13 +162,14 @@ class AddComplaints : AppCompatActivity() {
     private fun storeInDatabase() {
         val description = binding.etComplaintDescription.text.toString().trim()
         district = binding.etDistrict.text.toString().trim()
+        count = binding.etCount.text.toString().trim().toLong()
         val loc = binding.etLocation.text.toString().trim()
         val time = Calendar.getInstance().timeInMillis
         var vUrl = ""
 
         if (videoUrl.isNotEmpty())
             vUrl = videoUrl
-        val complaintId = FirebaseDatabase.getInstance().getReference("Complaints")
+        val complaintId = FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Complaints")
             .push().key
 
         val complaint = Complaint(
@@ -174,32 +180,57 @@ class AddComplaints : AppCompatActivity() {
             userId = FirebaseAuth.getInstance().uid.toString(),
             location = loc,
             complaintId = complaintId,
-            imageUrlList = imageUrlList
+            imageUrlList = imageUrlList,
+            count = count
         )
 
-        FirebaseDatabase.getInstance().getReference("Complaints/$complaintId")
+        FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Complaints/$complaintId")
             .setValue(complaint)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     com.example.miniprojectcomplaintbox.utils.dismissDialog()
                     getNotificationToken()
+                    onBackPressed()
                 }
+            }
+            .addOnFailureListener{
+                com.example.miniprojectcomplaintbox.utils.dismissDialog()
+                Toast.makeText(this,"Unable to store data",Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun getNotificationToken() {
-        for (dis in district) {
-            FirebaseDatabase.getInstance().getReference("Staff/$dis")
-                .get().addOnSuccessListener {
-                    for (children in it.children) {
-                        val userData = children.getValue(LoginData::class.java)
-                        if (userData!!.token != null && userData.token != "")
-                            setNotificationToken(userData.token!!)
+        FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app")
+            .getReference("Staff/$district")
+            .get().addOnSuccessListener {
+                for (children in it.children) {
+                    val userData = children.getValue(LoginData::class.java)
+                    if (userData!!.token != null && userData.token != "") {
+                        //setNotificationToken(userData.token!!)
+                        //Log.d("Token",userData.token)
+                        //Log.d("UserId",userData.userId.toString())
+                        triggerNotification(userData.userId,userData.token)
                     }
                 }
-        }
-
+            }
     }
+
+    private fun triggerNotification(userId : String?,token: String?){
+        FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app")
+            .getReference("StaffKey/$userId").get().addOnSuccessListener {
+                val keyData = it.getValue(KeyData::class.java)
+                Log.d("Token","UserData")
+                if (keyData != null) {
+                    if(keyData.count!! <= count){
+                        Log.d("Count","Count validation")
+                        setNotificationToken(token!!)
+
+                    }
+
+                }
+            }
+    }
+
 
     private fun checkForPermission(code: Int) {
         Dexter.withContext(this)
@@ -292,30 +323,41 @@ class AddComplaints : AppCompatActivity() {
 
     private fun setNotificationToken(token: String) {
         PushNotification(
-            NotificationData("Got an problem", "Some one has posted an problem click to view."),
+            NotificationData("Food Details", "Some one has posted about surplus food click to view."),
             token
         ).also {
             sendNotification(it)
         }
     }
 
-    private fun sendNotification(notification: PushNotification) =
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = RetrofitInstance.api.postNotification(notification)
-                if (response.isSuccessful) {
+    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if (response.isSuccessful) {
+                withContext(Dispatchers.Main) {
                     Toast.makeText(
                         applicationContext,
                         "Notification has been sent successfully",
                         Toast.LENGTH_LONG
                     ).show()
-
-                } else {
-                    Toast.makeText(applicationContext, "Error occured", Toast.LENGTH_LONG).show()
-
                 }
-            } catch (e: Exception) {
-                Log.e("TAGData", e.toString())
+                Log.d("Noti", "Sent")
+            } else {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(applicationContext, "Error occurred", Toast.LENGTH_LONG).show()
+                }
+                Log.d("Noti", "Not Sent")
             }
+        } catch (e: Exception) {
+            Log.e("TAGDataExp", e.toString())
         }
+    }
+
+
+    override fun onBackPressed() {
+        val intent = Intent(this,MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 }

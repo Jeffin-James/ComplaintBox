@@ -1,5 +1,6 @@
 package com.example.miniprojectcomplaintbox.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -30,6 +31,7 @@ class UserRvAdapter(
         val statusLL: LinearLayout = itemView.findViewById(R.id.comp_status_indicator)
         val card: CardView = itemView.findViewById(R.id.comp_card)
         val videoStatus: TextView = itemView.findViewById(R.id.card_videoStatus)
+        val count : TextView = itemView.findViewById(R.id.card_count)
 
     }
 
@@ -38,19 +40,21 @@ class UserRvAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserRvAdapter.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.complaint_card,parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.complaint_card,parent,false)
         return ViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: UserRvAdapter.ViewHolder, position: Int) {
         val comp = compList?.get(position)
         holder.videoStatus.visibility = View.GONE
-        holder.titleView.text = (comp?.description?.substring(0,10)) +"...."
-        holder.locationView.text= (comp?.location?.substring(0,10))+"....."
+        holder.titleView.text = comp?.description
+        holder.locationView.text= comp?.location
         holder.itemView.setOnClickListener {
             clickListener.onCardClick(comp!!)
         }
         holder.districtView.text = comp?.district
+        holder.count.text = comp?.count.toString()
         holder.timeView.text = getDateTime(comp?.timeStamp!!)
         if (comp.solved!!) {
             holder.statusLL.setBackgroundColor(context.getColor(R.color.lawn_green))

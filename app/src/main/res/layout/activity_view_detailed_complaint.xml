@@ -54,7 +54,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:letterSpacing="0.02"
-                        android:text="Complaint raised on "
+                        android:text="Food posted on "
                         android:textColor="@color/dark_turquoise"
                         android:textSize="@dimen/_14ssp"
                         android:textStyle="bold" />
@@ -124,7 +124,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawablePadding="@dimen/_5sdp"
-                        android:text="Complaint location:"
+                        android:text="Food Location:"
                         android:letterSpacing=".020"
                         android:gravity="center"
                         android:padding="@dimen/_8sdp"
@@ -170,7 +170,37 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawablePadding="@dimen/_5sdp"
-                        android:hint="Complaint location"
+                        android:hint="Food location"
+                        android:letterSpacing=".020"
+                        android:gravity="center"
+                        android:padding="@dimen/_8sdp"
+                        android:scrollIndicators="end"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black"
+                        android:textSize="@dimen/_12ssp" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/_5sdp"
+                        android:text="Count:"
+                        android:letterSpacing=".020"
+                        android:gravity="center"
+                        android:padding="@dimen/_8sdp"
+                        android:scrollIndicators="end"
+                        android:textColor="@color/dark_turquoise"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/_12ssp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvViewComplaintCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/_5sdp"
+                        android:hint="Food Count"
                         android:letterSpacing=".020"
                         android:gravity="center"
                         android:padding="@dimen/_8sdp"

@@ -13,6 +13,7 @@ import com.example.miniprojectcomplaintbox.adapter.UserRvAdapter
 import com.example.miniprojectcomplaintbox.data.Complaint
 import com.example.miniprojectcomplaintbox.databinding.ActivityViewComplaintsBinding
 import com.example.miniprojectcomplaintbox.notification.FirebaseService.Companion.sharedPref
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -27,34 +28,39 @@ class ViewComplaints : AppCompatActivity(), UserRvAdapter.CardClickListener {
     lateinit var currentUserId: String
     var isStaff : Boolean = false
     var district: String? = null
-    private lateinit var context : Context
+    var count: Long = 0
+    private lateinit var sharedPref : SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewComplaintsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        getFirebaseData()
         binding.viewAllComplaints.layoutManager = LinearLayoutManager(applicationContext)
-        sharedPref = context.getSharedPreferences("Shared_Pref", MODE_PRIVATE)
-        district = sharedPref.getString()
+        sharedPref = getSharedPreferences("Shared_Pref", MODE_PRIVATE)
+        district = sharedPref!!.getString("district","")
+        count = sharedPref!!.getLong("count",0)
+        Log.d("CountNum",count.toString())
         compList.observe(this) { list ->
             var cList = if (district != null && district!!.isNotEmpty()) {
                 list?.filter {
-                    it?.district?.contains(district!!)!!
+                    it?.district?.contains(district!!)!! && (it?.count!! >= count)
                 }
             } else {
                 list?.filter { it?.userId.equals(currentUserId) }
             }
-            rvAdapter = UserRvAdapter(applicationContext, cList, )
+            rvAdapter = UserRvAdapter(this,cList, this)
             binding.viewAllComplaints.adapter = rvAdapter
         }
-        getFirebaseData()
-
     }
 
 
     private fun getFirebaseData() {
 
-        FirebaseDatabase.getInstance().getReference("Complaints")
+        currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+
+        FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Complaints")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val list = mutableListOf<Complaint?>()
@@ -75,10 +81,17 @@ class ViewComplaints : AppCompatActivity(), UserRvAdapter.CardClickListener {
 
     override fun onCardClick(comp: Complaint) {
         val intent = Intent(this,ViewDetailedComplaint::class.java)
-        intent.putExtra("complaint",comp)
+        intent.putExtra("complaint_Id",comp.complaintId)
         startActivity(intent)
-
+        finish()
     }
+
+    override fun onBackPressed() {
+        val intent = Intent(this,MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 
 
 }

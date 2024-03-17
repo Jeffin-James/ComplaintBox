@@ -1,28 +1,22 @@
 package com.example.miniprojectcomplaintbox
 
-import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.SyncStateContract.Constants
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import com.example.miniprojectcomplaintbox.data.KeyData
 import com.example.miniprojectcomplaintbox.databinding.ActivityLoginBinding
 import com.example.miniprojectcomplaintbox.model.UserData
-import com.example.miniprojectcomplaintbox.utils.LoadingDialog
+import com.example.miniprojectcomplaintbox.utils.initLoadingDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 
 class LoginActivity : AppCompatActivity() {
@@ -30,8 +24,8 @@ class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
     private lateinit var phoneNumber : String
     private lateinit var verificationID : String
-    private lateinit var loadingDialog: LoadingDialog
     private lateinit var district : String
+    private var count: Long? = null
     private lateinit var database : DatabaseReference
     private lateinit var currentUserId : String
 
@@ -41,12 +35,9 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar!!.hide()
-        loadingDialog = LoadingDialog(this,"Loading Please Wait!!!")
+        initLoadingDialog(this)
         auth = FirebaseAuth.getInstance()
         clickListener()
-
-
-
     }
 
     private fun clickListener(){
@@ -87,20 +78,26 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun verifyUser() {
-        FirebaseDatabase.getInstance()
+        FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app")
             .getReference("StaffKey/${FirebaseAuth.getInstance().uid}")
             .get()
             .addOnSuccessListener {
                 if (it.exists()) {
                     val keyData = it.getValue(KeyData::class.java)
-                    getSharedPreferences("Shared_Pref", MODE_PRIVATE).edit()
-                        .putBoolean("isStaff", true)
-                        .putString("district", keyData!!.district.toString())
-                        .apply()
+                    keyData!!.count?.let { it1 ->
+                        getSharedPreferences("Shared_Pref", MODE_PRIVATE).edit()
+                            .putBoolean("isStaff", true)
+                            .putString("district", keyData!!.district.toString())
+                            .putString("name",keyData!!.name.toString())
+                            .putLong("count", it1)
+                            .apply()
+                    }
                     currentUserId = FirebaseAuth.getInstance().uid.toString()
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
-                    Log.d("TAGData", "getData: ${keyData!!.district}")
+                    Log.d("TAGData", "getData: ${keyData.district}")
+                    Log.d("TAGData", "getData: ${keyData.count}")
+                    Log.d("TAGData", "getData: ${keyData.name}")
                 } else {
                     Toast.makeText(this, "Make sure you are a staff", Toast.LENGTH_LONG)
                         .show()
@@ -109,9 +106,26 @@ class LoginActivity : AppCompatActivity() {
 
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Make sure you are a staff", Toast.LENGTH_LONG)
-                    .show()
-                FirebaseAuth.getInstance().signOut()
+                //district = getDistrict()
+                //count = getCount()
+                FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app")
+                    .getReference("StaffKey/${FirebaseAuth.getInstance().uid.toString()}")
+                    .setValue(
+                        KeyData(
+                            district = district,
+                            userId = FirebaseAuth.getInstance().uid.toString(),
+                            count = count
+                        )
+                    ).addOnSuccessListener {
+                        getSharedPreferences("Shared_Pref", MODE_PRIVATE).edit()
+                            .putBoolean("isStaff", true)
+                            .putString("district", district)
+                            .putLong("count", count!!)
+                            .apply()
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+                    }
+
             }
     }
 
@@ -120,7 +134,7 @@ class LoginActivity : AppCompatActivity() {
         binding.staffLogin.visibility = View.VISIBLE
     }
     private fun getOTP(){
-        loadingDialog.startLoading()
+        com.example.miniprojectcomplaintbox.utils.showDialog()
         phoneNumber = binding.phoneNumber.text.toString().trim()
         if(!phoneNumber.isEmpty() && phoneNumber.length == 10){
             phoneNumber = "+91$phoneNumber"
@@ -140,24 +154,24 @@ class LoginActivity : AppCompatActivity() {
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-            loadingDialog.dismiss()
+            com.example.miniprojectcomplaintbox.utils.dismissDialog()
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
 
             if (e is FirebaseAuthInvalidCredentialsException) {
-                loadingDialog.dismiss()
+                com.example.miniprojectcomplaintbox.utils.dismissDialog()
                 Log.d("CheckMobile", "onVerificationFailed: ${e.message} ")
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
             }
             else if (e is FirebaseTooManyRequestsException) {
-                loadingDialog.dismiss()
+                com.example.miniprojectcomplaintbox.utils.dismissDialog()
                 Log.d("CheckMobile", "onVerificationFailed: ${e.message} ")
 
                 Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
             }
 
-            loadingDialog.dismiss()
+            com.example.miniprojectcomplaintbox.utils.dismissDialog()
             Log.d("CheckMobile", "onVerificationFailed: ${e.message} ")
 
             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
@@ -167,7 +181,7 @@ class LoginActivity : AppCompatActivity() {
             verificationId: String,
             token: PhoneAuthProvider.ForceResendingToken
         ) {
-            loadingDialog.dismiss()
+            com.example.miniprojectcomplaintbox.utils.dismissDialog()
             verificationID = verificationId
             binding.sendOTPForm.visibility = View.GONE
             binding.enterOTPForm.visibility = View.VISIBLE
@@ -176,14 +190,14 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun verifyOtp() {
-        loadingDialog.startLoading()
+        com.example.miniprojectcomplaintbox.utils.showDialog()
         if (verificationID.isNotEmpty() && binding.enterOTP.text.toString().isNotEmpty()) {
             val phoneAuthCredential = PhoneAuthProvider.getCredential(
                 verificationID, binding.enterOTP.text.toString().trim()
             )
             signInWithPhoneAuthCredential(phoneAuthCredential)
         } else {
-            loadingDialog.dismiss()
+            com.example.miniprojectcomplaintbox.utils.dismissDialog()
             Snackbar.make(binding.root, "Check the OTP", Snackbar.LENGTH_LONG).show()
         }
     }
@@ -192,20 +206,20 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    loadingDialog.dismiss()
+                    com.example.miniprojectcomplaintbox.utils.dismissDialog()
                     checkDatabase()
                 } else {
-                    loadingDialog.dismiss()
+                    com.example.miniprojectcomplaintbox.utils.dismissDialog()
                 }
             }
             .addOnFailureListener{
-                loadingDialog.dismiss()
+                com.example.miniprojectcomplaintbox.utils.dismissDialog()
                 Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
             }
     }
 
     private fun checkDatabase() {
-        FirebaseDatabase.getInstance("https://miniprojectcomplaintbox-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("UserData/${FirebaseAuth.getInstance().uid}")
+        FirebaseDatabase.getInstance(Utils.DB_URL).getReference("UserData/${FirebaseAuth.getInstance().uid}")
             .get()
             .addOnSuccessListener {
                 if (it.exists()){
@@ -241,6 +255,14 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             }
     }
+
+    private fun getDistrict(): String {
+        binding.staffLogin.visibility = View.GONE
+        binding.detailsForm.visibility = View.VISIBLE
+        binding.enterName.visibility = View.GONE
+        return binding.enterDistrict.text.toString().trim()
+    }
+
 
     override fun onStart() {
         super.onStart()

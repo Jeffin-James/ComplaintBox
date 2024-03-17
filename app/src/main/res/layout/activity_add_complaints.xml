@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:letterSpacing="0.02"
-                    android:text="Attach your complaint"
+                    android:text="Description"
                     android:textSize="@dimen/_14ssp"
                     android:textStyle="bold" />
 
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:background="@drawable/background_edit_text"
-                    android:hint="Complaint Description"
+                    android:hint="Food Description"
                     android:letterSpacing=".020"
                     android:padding="@dimen/_12sdp"
                     android:scrollIndicators="end"
@@ -164,6 +164,28 @@
                     android:background="@drawable/background_edit_text"
                     android:drawablePadding="@dimen/_10sdp"
                     android:hint="Type your District"
+                    android:letterSpacing=".020"
+                    android:padding="@dimen/_12sdp"
+                    android:scrollIndicators="end"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:text="Type Count"
+                    android:textSize="@dimen/_14ssp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:background="@drawable/background_edit_text"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:hint="Type Count"
                     android:letterSpacing=".020"
                     android:padding="@dimen/_12sdp"
                     android:scrollIndicators="end"

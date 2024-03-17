@@ -6,11 +6,11 @@
             android:icon="@drawable/baseline_home_24"
             />
         <item android:id="@+id/addComplaint"
-            android:title="Add Complaint"
+            android:title="Add Food Details"
             android:icon="@drawable/baseline_add_comment_24"
             />
         <item android:id="@+id/viewComplaint"
-            android:title="View Complaint"
+            android:title="View Food Details"
             android:icon="@drawable/baseline_comment_24"
             />
     </group>

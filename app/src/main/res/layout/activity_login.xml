@@ -15,7 +15,7 @@
         android:background="#8692f7"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -149,7 +149,7 @@
         android:background="#8692f7"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -272,6 +272,7 @@
                     android:padding="8dp"
                     android:textColor="@color/black"
                     android:textColorHighlight="@color/cardview_dark_background" />
+
 
                 <Button
                     android:id="@+id/nextButton"
